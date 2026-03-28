@@ -120,25 +120,59 @@ export const generateGlobalMetrics = (projects, logs) => {
     const pTotalHours = projectLogs.reduce((acc, curr) => acc + Number(curr.hours), 0);
     const pRate = pTotalHours > 0 ? (Number(p.price) / pTotalHours).toFixed(2) : 0;
     
-    // 1. Budget Warnings
+    // Insight 1: Profit Margin Decay Predictor
+    if (pTotalHours > Number(p.estimatedHours) * 0.7 && pTotalHours < Number(p.estimatedHours)) {
+      const hoursLeft = Number(p.estimatedHours) - pTotalHours;
+      detailedInsights.push({
+        id: `burnrate-${p.id}`,
+        type: 'warning',
+        title: `🔥 Pipeline Predictor: Margin Decay on "${p.name}"`,
+        description: `You have burned ${Math.round((pTotalHours/Number(p.estimatedHours))*100)}% of your estimated budget. At your current operational burn rate, your effective hourly rate will drop below acceptable minimum limits in exactly ${Math.max(1, hoursLeft).toFixed(1)} hours. ACTION: Freeze all new scope requests instantly.`
+      });
+    }
+
+    // Insight 2: Severe Budget Overrun
     if (pTotalHours > Number(p.estimatedHours)) {
       const overPercent = (((pTotalHours - Number(p.estimatedHours)) / Number(p.estimatedHours)) * 100).toFixed(1);
       detailedInsights.push({
         id: `budget-${p.id}`,
         type: 'danger',
-        title: `"${p.name}" is ${overPercent}% over budget`,
-        description: `You estimated ${p.estimatedHours}h but have logged ${pTotalHours}h. Your effective rate on this project has dropped to $${pRate}/hr.`
+        title: `🚨 CRITICAL: "${p.name}" is ${overPercent}% over budget`,
+        description: `You estimated ${p.estimatedHours}h but logged ${pTotalHours}h. Your effective rate has plummeted to $${pRate}/hr. The pipeline predicts complete operational exhaustion. ACTION: Renegotiate retainer parameters immediately or fire client.`
       });
     }
 
-    // 2. Call/Revision Heavy
+    // Insight 3: The "Client Upsell" / Goldmine Predictor
+    const billableLogs = projectLogs.filter(l => l.category === 'Billable').reduce((a, b) => a + Number(b.hours), 0);
+    const billableRatio = pTotalHours > 0 ? (billableLogs / pTotalHours) : 0;
+    if (pTotalHours > 5 && billableRatio > 0.85 && Number(pRate) >= Number(p.minRate) * 1.5) {
+      detailedInsights.push({
+        id: `upsell-${p.id}`,
+        type: 'info',
+        title: `💰 Goldmine Predictor: Upsell "${p.client}"`,
+        description: `Highest Efficiency Detected: Your effective rate of $${pRate}/hr is 150%+ above your minimum target with zero friction. ACTION: Pitch a permanent high-ticket $3k+ monthly retainer to this client today.`
+      });
+    }
+
+    // Insight 4: Toxic Scope Micro-Increments
+    const revisionCount = projectLogs.filter(l => l.category === 'Revisions').length;
+    if (revisionCount >= 3) {
+      detailedInsights.push({
+        id: `toxic-${p.id}`,
+        type: 'danger',
+        title: `⚠️ Toxic Client Algorithm: "${p.client}"`,
+        description: `This client is repeatedly requesting revisions in isolated micro-increments (${revisionCount} separate events). This psychological pattern drains deep work states. ACTION: Enforce a strict 'Per-Revision Fee' structure instantly.`
+      });
+    }
+
+    // Insight 5: Communication Bleed
     const callHours = projectLogs.filter(l => l.category === 'Calls').reduce((a, b) => a + Number(b.hours), 0);
-    if (callHours > 5) {
+    if (callHours > Number(p.estimatedHours) * 0.2) {
       detailedInsights.push({
         id: `calls-${p.id}`,
         type: 'warning',
-        title: `Meeting Heavy: "${p.name}"`,
-        description: `You've spent ${callHours} hours on non-billable calls for this client. Try switching to async communication to protect your margin.`
+        title: `📞 Asynchronous Bleed: "${p.name}"`,
+        description: `You've spent over 20% of your total budget (${callHours} hours) just sitting on non-billable phone calls. ACTION: Demand asynchronous communication via Slack/Email only to mathematically protect your margin.`
       });
     }
 

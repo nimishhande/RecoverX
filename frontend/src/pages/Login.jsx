@@ -32,10 +32,7 @@ const Login = () => {
     const res = await login(email, password);
     if (res.success) {
       // Voice Greeting Feature (AI voice)
-      const nameMatch = email.split('@')[0] || 'User';
-      const name = nameMatch.charAt(0).toUpperCase() + nameMatch.slice(1);
-      
-      const utterance = new SpeechSynthesisUtterance(`Welcome back, ${name}. Initializing your profit intelligence engine.`);
+      const utterance = new SpeechSynthesisUtterance(`Welcome back, Sanchita. Initializing your profit intelligence engine.`);
       utterance.rate = 0.95; 
       utterance.pitch = 1.05;
       

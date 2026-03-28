@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -14,8 +14,16 @@ const Projects = () => {
     name: '', client: '', price: '', estimatedHours: '', minRate: ''
   });
   const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef(null);
 
   const handleVoiceFill = () => {
+    // Toggle off if currently listening
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      return;
+    }
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert("Browser does not support voice recognition. Please use Google Chrome.");
@@ -23,34 +31,70 @@ const Projects = () => {
     }
 
     const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
     recognition.lang = 'en-US';
-    recognition.interimResults = false;
+    recognition.interimResults = true; // Enables real-time form filling
+    recognition.continuous = true; // Keeps listening until user clicks Stop
     
     recognition.onstart = () => setIsListening(true);
     
     recognition.onresult = (event) => {
-      const txt = event.results[0][0].transcript.toLowerCase();
+      // Gather everything spoken so far in this continuous session
+      let fullTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        fullTranscript += event.results[i][0].transcript;
+      }
+      const txt = fullTranscript.toLowerCase();
+      
       let newForm = { ...formData };
       
-      const nameMatch = txt.match(/project\s+(.*?)(?=\s+client|\s+price|\s+hours|\s+rate|$)/i);
-      const clientMatch = txt.match(/client\s+(.*?)(?=\s+project|\s+price|\s+hours|\s+rate|$)/i);
-      const priceMatch = txt.match(/price\s+(?:of\s+)?(?:is\s+)?(\d+)/i);
-      const hoursMatch = txt.match(/(?:estimated\s+)?hours\s+(?:are\s+)?(\d+)|(\d+)\s+hours/i);
-      const rateMatch = txt.match(/rate\s+(?:of\s+)?(?:is\s+)?(\d+)|(\d+)\s+rate/i) || txt.match(/minimum\s+rate\s+(?:of\s+)?(\d+)/i);
+      // Much more forgiving Regex that looks for any number or text after keywords
+      // Name: anything after "project" up to the next keyword
+      const nameMatch = txt.match(/project(\s+is|\s+called|\s+name)?\s+(.*?)(?=\bclient\b|\bprice\b|\bhours\b|\brate\b|$)/i);
+      // Client: anything after "client" up to the next keyword
+      const clientMatch = txt.match(/client(\s+is|\s+name)?\s+(.*?)(?=\bproject\b|\bprice\b|\bhours\b|\brate\b|$)/i);
+      // Price: find the number after price
+      const priceMatch = txt.match(/price.*?(\d+)/i);
+      // Hours: number near hours
+      const hoursMatch = txt.match(/hours.*?(\d+)|(\d+).*?hours/i);
+      // Rate: number near rate
+      const rateMatch = txt.match(/rate.*?(\d+)|(\d+).*?rate/i);
 
-      if (nameMatch) newForm.name = nameMatch[1].replace(/\b\w/g, l => l.toUpperCase());
-      if (clientMatch) newForm.client = clientMatch[1].replace(/\b\w/g, l => l.toUpperCase());
-      if (priceMatch) newForm.price = priceMatch[1];
-      if (hoursMatch) newForm.estimatedHours = hoursMatch[1] || hoursMatch[2];
-      if (rateMatch) newForm.minRate = rateMatch[1] || rateMatch[2] || rateMatch[3];
+      if (nameMatch && nameMatch[2].trim()) {
+        newForm.name = nameMatch[2].trim().replace(/\b\w/g, l => l.toUpperCase());
+      }
+      if (clientMatch && clientMatch[2].trim()) {
+        newForm.client = clientMatch[2].trim().replace(/\b\w/g, l => l.toUpperCase());
+      }
+      if (priceMatch && priceMatch[1]) {
+        newForm.price = priceMatch[1];
+      }
+      if (hoursMatch && (hoursMatch[1] || hoursMatch[2])) {
+        newForm.estimatedHours = hoursMatch[1] || hoursMatch[2];
+      }
+      if (rateMatch && (rateMatch[1] || rateMatch[2])) {
+        newForm.minRate = rateMatch[1] || rateMatch[2];
+      }
 
       setFormData(newForm);
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech Recognition Error: ", event.error);
+      if (event.error === 'not-allowed') {
+        alert("Microphone access was blocked. Please click the camera/mic icon in your address bar (top right) to Allow it!");
+      }
       setIsListening(false);
     };
 
-    recognition.onerror = () => setIsListening(false);
     recognition.onend = () => setIsListening(false);
-    recognition.start();
+    
+    try {
+      recognition.start();
+    } catch (e) {
+      console.error(e);
+      setIsListening(false);
+    }
   };
 
   useEffect(() => {

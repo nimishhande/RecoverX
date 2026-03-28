@@ -155,19 +155,39 @@ const Dashboard = () => {
         {/* Charts */}
         <div className="rx-dashboard-charts">
           <Card title="Earnings Trend" subtitle="YTD actual revenue based on project total price value">
-            <div style={{ width: '100%', height: 300, marginTop: 20 }}>
+            <div style={{ position: 'relative', width: '100%', height: 300, marginTop: 20, overflow: 'hidden' }}>
+              {/* Background Nakshatra Engine */}
+              <div className="rx-nak-container" style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: 0.3 }}>
+                <style>{`
+                  .rx-nak-container { display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, rgba(0,204,106,0.05) 0%, transparent 70%); border-radius: 8px; }
+                  .rx-nak-ring-1 { position: absolute; width: 160px; height: 160px; border: 1px dashed rgba(0,204,106,0.4); border-radius: 50%; animation: nak-spin 12s linear infinite; }
+                  .rx-nak-ring-2 { position: absolute; width: 220px; height: 220px; border: 1px solid rgba(168,85,247,0.3); border-radius: 50%; animation: nak-spin-rev 18s linear infinite; }
+                  .rx-nak-ring-3 { position: absolute; width: 100px; height: 100px; border: 2px dotted rgba(59,130,246,0.5); border-radius: 50%; animation: nak-spin 8s linear infinite; }
+                  .rx-nak-core { position: absolute; width: 44px; height: 44px; background: rgba(0,255,136,0.15); border: 2px solid #00cc6a; box-shadow: 0 0 25px rgba(0,204,106,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: nak-pulse 2s ease-in-out infinite; color: #00cc6a; font-size: 0.8rem; font-weight: 800; }
+                  @keyframes nak-spin { 100% { transform: rotate(360deg); } }
+                  @keyframes nak-spin-rev { 100% { transform: rotate(-360deg); } }
+                  @keyframes nak-pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.1); } }
+                `}</style>
+                <div className="rx-nak-ring-2"><div className="rx-nak-node"/></div>
+                <div className="rx-nak-ring-1"><div className="rx-nak-node-green"/></div>
+                <div className="rx-nak-ring-3"><div className="rx-nak-node-blue"/></div>
+                <div className="rx-nak-core">AI</div>
+              </div>
+              {/* Foreground Chart */}
               <ResponsiveContainer>
                 {earningsTrend.length > 0 ? (
                   <LineChart data={earningsTrend} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={rxBorder} vertical={false} />
                     <XAxis dataKey="name" stroke="#5a7568" tick={{fill: '#8a9e93'}} />
                     <YAxis stroke="#5a7568" tick={{fill: '#8a9e93'}} tickFormatter={(value) => `$${value}`} />
-                    <Tooltip 
+                    <Tooltip
                       contentStyle={{ backgroundColor: 'rgba(10, 25, 18, 0.9)', borderColor: rxBorder, borderRadius: 8, color: '#e8f0ec' }}
                       itemStyle={{ color: '#00ff88' }}
                       formatter={(value) => [`$${value.toLocaleString()}`, 'Earnings']}
                     />
-                    <Line type="monotone" dataKey="earnings" stroke="#00ff88" strokeWidth={3} dot={{ fill: '#0a1210', stroke: '#00ff88', strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
+                    <Line type="monotone" dataKey="earnings" stroke="#00ff88" strokeWidth={3}
+                      dot={{ fill: '#0a1210', stroke: '#00ff88', strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6 }} />
                   </LineChart>
                 ) : (
                   <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--rx-text-muted)' }}>Not enough data for trend</div>
@@ -228,6 +248,64 @@ const Dashboard = () => {
                   No active alerts. You are running smoothly!
                 </div>
               )}
+            </div>
+          </Card>
+
+          {/* Meaningless Visual "Nakshatra Engine" Widget */}
+          <Card title="Agentic Synthesis Core" subtitle="Live neural pathfinding telemetry" style={{ marginTop: '24px' }}>
+            <style>
+              {`
+                .rx-nak-container { position: relative; width: 100%; height: 260px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: radial-gradient(circle at center, rgba(0,204,106,0.05) 0%, transparent 70%); border-radius: 8px; }
+                .rx-nak-ring-1 { position: absolute; width: 160px; height: 160px; border: 1px dashed rgba(0,204,106,0.4); border-radius: 50%; animation: nak-spin 12s linear infinite; box-shadow: inset 0 0 20px rgba(0,204,106,0.05); }
+                .rx-nak-ring-2 { position: absolute; width: 220px; height: 220px; border: 1px solid rgba(168,85,247,0.3); border-radius: 50%; animation: nak-spin-rev 18s linear infinite; }
+                .rx-nak-ring-3 { position: absolute; width: 100px; height: 100px; border: 2px dotted rgba(59,130,246,0.5); border-radius: 50%; animation: nak-spin 8s linear infinite; }
+                .rx-nak-core { position: absolute; width: 44px; height: 44px; background: rgba(0,255,136,0.15); border: 2px solid #00cc6a; box-shadow: 0 0 25px rgba(0,204,106,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: nak-pulse 2s ease-in-out infinite; color: #00cc6a; font-size: 0.8rem; font-weight: 800; z-index: 5; }
+                .rx-nak-node { position: absolute; width: 10px; height: 10px; background: #a855f7; box-shadow: 0 0 15px #a855f7; border-radius: 50%; top: -5px; left: 50%; transform: translateX(-50%); }
+                .rx-nak-node-green { position: absolute; width: 8px; height: 8px; background: #00cc6a; box-shadow: 0 0 10px #00cc6a; border-radius: 50%; top: 75%; right: -4px; }
+                .rx-nak-node-blue { position: absolute; width: 6px; height: 6px; background: #3b82f6; box-shadow: 0 0 10px #3b82f6; border-radius: 50%; bottom: -3px; left: 50%; transform: translateX(-50%); }
+                .rx-data-stream { position: absolute; top: 12px; left: 16px; font-family: monospace; font-size: 0.7rem; color: rgba(0,204,106,0.7); animation: nak-flicker 2s infinite; letter-spacing: 1px; line-height: 1.6; }
+                .rx-data-stream-right { position: absolute; bottom: 12px; right: 16px; font-family: monospace; font-size: 0.65rem; color: rgba(168,85,247,0.6); text-align: right; line-height: 1.6; }
+                @keyframes nak-spin { 100% { transform: rotate(360deg); } }
+                @keyframes nak-spin-rev { 100% { transform: rotate(-360deg); } }
+                @keyframes nak-pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(0,204,106,0.4); } 50% { transform: scale(1.1); box-shadow: 0 0 35px rgba(0,204,106,0.9); } }
+                @keyframes nak-flicker { 0% { opacity: 0.3; } 50% { opacity: 1; } 60% { opacity: 0.2; } 100% { opacity: 0.8; } }
+              `}
+            </style>
+            
+            <div className="rx-nak-container">
+               {/* Decorative Background Axes */}
+               <svg style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 0, opacity: 0.15 }}>
+                 <line x1="0" y1="50%" x2="100%" y2="50%" stroke="#00cc6a" strokeWidth="1" strokeDasharray="4 4" />
+                 <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#00cc6a" strokeWidth="1" strokeDasharray="4 4" />
+                 <circle cx="50%" cy="50%" r="90" fill="none" stroke="#fff" strokeWidth="1" strokeDasharray="2 8" />
+               </svg>
+
+               <div className="rx-data-stream">
+                 0xFA82B19C<br/>
+                 0x99A0CCC2<br/>
+                 P-NODE ACTIVE<br/>
+                 <span style={{ color: '#fff' }}>[SYNCING...]</span>
+               </div>
+               
+               <div className="rx-data-stream-right">
+                 TGT: OPTIMAL<br/>
+                 VAR: 0.0094<br/>
+                 NET: STABLE
+               </div>
+               
+               <div className="rx-nak-ring-2">
+                 <div className="rx-nak-node"></div>
+               </div>
+               
+               <div className="rx-nak-ring-1">
+                 <div className="rx-nak-node-green"></div>
+               </div>
+
+               <div className="rx-nak-ring-3">
+                 <div className="rx-nak-node-blue"></div>
+               </div>
+               
+               <div className="rx-nak-core">AI</div>
             </div>
           </Card>
         </div>
