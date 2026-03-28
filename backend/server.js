@@ -32,8 +32,28 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'RecoverX Auth Service' });
 });
 
+// Seed test user if empty
+const bcrypt = require('bcryptjs');
+const db = require('./db');
+
+async function seedDatabase() {
+  const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
+  if (userCount === 0) {
+    console.log('--- Seeding default test user ---');
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash('Password123!', salt);
+    db.prepare(`
+      INSERT INTO users (firstname, lastname, email, password, role)
+      VALUES (?, ?, ?, ?, ?)
+    `).run('Test', 'User', 'test@recoverx.com', hashedPassword, 'ADMIN');
+    console.log('✓ Success: Use test@recoverx.com / Password123!');
+  }
+}
+
 // Start server
-app.listen(PORT, () => {
-  console.log(`✓ RecoverX backend running on http://localhost:${PORT}`);
-  console.log(`✓ Auth API: http://localhost:${PORT}/api/v1/auth`);
+seedDatabase().then(() => {
+  app.listen(PORT, () => {
+    console.log(`✓ RecoverX backend running on http://localhost:${PORT}`);
+    console.log(`✓ Auth API: http://localhost:${PORT}/api/v1/auth`);
+  });
 });

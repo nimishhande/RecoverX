@@ -45,8 +45,8 @@ router.post('/register', async (req, res) => {
         lastname,
         role: userRole
       },
-      process.env.JWT_SECRET,
-      { expiresIn: parseInt(process.env.JWT_EXPIRATION) / 1000 } // Convert ms to seconds
+      process.env.JWT_SECRET || 'recoverx_fallback_secret_key_12345',
+      { expiresIn: (parseInt(process.env.JWT_EXPIRATION) || 86400000) / 1000 } // Convert ms to seconds
     );
 
     // Return response (mirrors: AuthenticationResponse { token })
@@ -90,8 +90,8 @@ router.post('/authenticate', async (req, res) => {
         lastname: user.lastname,
         role: user.role
       },
-      process.env.JWT_SECRET,
-      { expiresIn: parseInt(process.env.JWT_EXPIRATION) / 1000 }
+      process.env.JWT_SECRET || 'recoverx_fallback_secret_key_12345',
+      { expiresIn: (parseInt(process.env.JWT_EXPIRATION) || 86400000) / 1000 }
     );
 
     // Return response (mirrors: AuthenticationResponse { token })

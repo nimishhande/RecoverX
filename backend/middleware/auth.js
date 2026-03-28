@@ -11,7 +11,7 @@ const authenticateToken = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'recoverx_fallback_secret_key_12345');
     req.user = decoded;
     next();
   } catch (error) {
