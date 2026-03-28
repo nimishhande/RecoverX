@@ -1,3 +1,22 @@
 {
-  "users": []
+  "users": [
+    {
+      "id": 1,
+      "firstname": "Test",
+      "lastname": "User",
+      "email": "test@recoverx.com",
+      "password": "$2a$10$uK15BoQ0ixI.8b1BtK09TuxhFAIvhCFyW/WWWAj8uwmTAvhIZUkSW",
+      "role": "ADMIN",
+      "created_at": "2026-03-28T08:40:59.496Z"
+    },
+    {
+      "id": 2,
+      "firstname": "Sanchita",
+      "lastname": "Pandey",
+      "email": "pandeysanchita96@gmail.com",
+      "password": "$2a$10$2unu3j7lNWL6HllnAf7q2ui7l6iUUvZam/r1oU0qhs63kkKs5HCJy",
+      "role": "USER",
+      "created_at": "2026-03-28T08:51:15.360Z"
+    }
+  ]
 }

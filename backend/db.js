@@ -47,19 +47,17 @@ class MockDB {
     const db = this;
     return {
       get(...args) {
-        if (sql.includes('SELECT count(*)')) {
+        const normalizedSql = sql.toLowerCase();
+        if (normalizedSql.includes('select count(*)')) {
           return { count: db.data.users.length };
         }
-        if (sql.includes('SELECT count')) {
+        if (normalizedSql.includes('select count')) {
           return { count: db.data.users.length };
         }
-        if (sql.includes('SELECT id FROM users WHERE email = ?') || sql.includes('SELECT * FROM users WHERE email = ?')) {
+        if (normalizedSql.includes('where email = ?')) {
           return db.data.users.find(u => u.email === args[0]) || null;
         }
-        if (sql.includes('SELECT id, firstname')) {
-           return db.data.users.find(u => u.id === args[0]) || null;
-        }
-        if (sql.includes('SELECT * FROM users WHERE id = ?')) {
+        if (normalizedSql.includes('where id = ?')) {
            return db.data.users.find(u => u.id === args[0]) || null;
         }
         return null;
