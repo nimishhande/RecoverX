@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Set API base URL
-  const API_URL = 'http://localhost:8080/api/v1/auth';
+  const API_URL = 'http://localhost:5000/api/v1/auth';
 
   useEffect(() => {
     const token = localStorage.getItem('token');

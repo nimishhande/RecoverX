@@ -8,7 +8,7 @@ const Home = () => {
   return (
     <div className="dashboard-container">
       <nav className="dashboard-nav">
-        <div className="dashboard-nav-logo">RecoverX</div>
+        <div className="dashboard-nav-logo">ProfitLens</div>
         <button onClick={logout} className="btn-logout">
           <LogOut size={16} /> Logout
         </button>
