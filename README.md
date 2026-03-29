@@ -57,4 +57,3 @@ If you want to blow the judges away, follow these exact steps:
 4. **Demonstrate the Agent**. Go to the Time Tracking tab. Create a manual time entry for an existing project. Set the hours incredibly high (e.g., `15`), and set the category to `"Revisions"`.
 5. **The Reveal**. Click back to the Dashboard. Because you just logged massive non-billable time, the charts will violently shift red, and the **⚡ Agent Advisor** card will instantly spawn on the right side, telling the user to hike their prices by 25%.
 
-Good luck team! You built an incredible, highly-functional software product.
